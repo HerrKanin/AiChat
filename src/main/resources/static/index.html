@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>AiChat</title>
+    <link rel="icon" href="data:,">
+</head>
+<body>
+<h1>AiChat</h1>
+
+<select id="personality">
+    <option value="helper">Helper</option>
+    <option value="coder">Coder</option>
+    <option value="pirate">Pirate</option>
+</select>
+
+<div id="chat"></div>
+
+<input id="message" placeholder="Skriv ett meddelande..." />
+<button onclick="sendMessage()">Skicka</button>
+
+<script>
+    const sessionId = crypto.randomUUID();
+
+    async function sendMessage() {
+        const messageInput = document.getElementById("message");
+        const chat = document.getElementById("chat");
+
+        const message = messageInput.value;
+        const personality = document.getElementById("personality").value;
+
+        chat.innerHTML += `<p><strong>Du:</strong> ${message}</p>`;
+        messageInput.value = "";
+
+        const response = await fetch("/api/v1/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                personality: personality,
+                message: message,
+                sessionId: sessionId
+            })
+        });
+
+        const data = await response.json();
+        console.log(data)
+
+        chat.innerHTML += `<p><strong>Bot:</strong> ${data.response}</p>`;
+    }
+</script>
+</body>
+</html>
