@@ -1,8 +1,11 @@
 package com.edvin.aichat.client;
 
 import com.edvin.aichat.config.OpenAiConfig;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +25,12 @@ public class OpenAiClient {
                 .defaultHeader("Content-Type", "application/json")
                 .build();
     }
+
+    @Retryable(
+            retryFor = RestClientException.class,
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
 
     public String sendMessage(String systemPrompt, List<String> history, String userMessage) {
         List<Map<String, String>> messages = new ArrayList<>();
