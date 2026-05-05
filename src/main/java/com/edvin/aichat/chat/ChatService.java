@@ -1,24 +1,24 @@
 package com.edvin.aichat.chat;
 
 import com.edvin.aichat.chat.dto.ChatRequest;
-import com.edvin.aichat.chat.dto.ChatResponse;
+import com.edvin.aichat.client.OpenAiClient;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 public class ChatService {
 
     private final PersonalityPromptService personalityPromptService;
     private final ChatMemoryService chatMemoryService;
+    private final OpenAiClient openAiClient;
 
-    public ChatService(PersonalityPromptService personalityPromptService, ChatMemoryService chatMemoryService) {
+    public ChatService(PersonalityPromptService personalityPromptService, ChatMemoryService chatMemoryService, OpenAiClient openAiClient) {
         this.personalityPromptService = personalityPromptService;
         this.chatMemoryService = chatMemoryService;
+        this.openAiClient = openAiClient;
     }
 
     public String process(ChatRequest request) {
-
         String sessionId = request.getSessionId() != null
                 ? request.getSessionId()
                 : "default";
@@ -27,13 +27,11 @@ public class ChatService {
 
         chatMemoryService.addMessage(sessionId, "user", request.getMessage());
 
-        List<String> history = chatMemoryService.getHistory(sessionId);
+        String aiResponse = openAiClient.sendMessage(systemPrompt, request.getMessage());
 
-        String response = "System: " + systemPrompt + "\nHistory: " + history;
+        chatMemoryService.addMessage(sessionId, "assistant", aiResponse);
 
-        chatMemoryService.addMessage(sessionId, "assistant", response);
-
-        return response;
+        return aiResponse;
     }
 
 }
