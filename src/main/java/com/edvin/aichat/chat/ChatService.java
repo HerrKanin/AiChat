@@ -27,7 +27,9 @@ public class ChatService {
 
         chatMemoryService.addMessage(sessionId, "user", request.getMessage());
 
-        String aiResponse = openAiClient.sendMessage(systemPrompt, request.getMessage());
+        var history = chatMemoryService.getHistory(sessionId);
+
+        String aiResponse = openAiClient.sendMessage(systemPrompt, history, request.getMessage());
 
         chatMemoryService.addMessage(sessionId, "assistant", aiResponse);
 

@@ -4,6 +4,7 @@ import com.edvin.aichat.config.OpenAiConfig;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,13 +23,22 @@ public class OpenAiClient {
                 .build();
     }
 
-    public String sendMessage(String systemPrompt, String userMessage) {
+    public String sendMessage(String systemPrompt, List<String> history, String userMessage) {
+        List<Map<String, String>> messages = new ArrayList<>();
+
+        messages.add(Map.of("role", "system", "content", systemPrompt));
+
+        for (String historyMessage : history) {
+            if (historyMessage.startsWith("user: ")) {
+                messages.add(Map.of("role", "user", "content", historyMessage.substring(6)));
+            } else if (historyMessage.startsWith("assistant: ")) {
+                messages.add(Map.of("role", "assistant", "content", historyMessage.substring(11)));
+            }
+        }
+
         Map<String, Object> requestBody = Map.of(
                 "model", openAiConfig.getModel(),
-                "messages", List.of(
-                        Map.of("role", "system", "content", systemPrompt),
-                        Map.of("role", "user", "content", userMessage)
-                )
+                "messages", messages
         );
 
         Map response =  restClient.post()
