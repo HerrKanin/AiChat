@@ -1,5 +1,7 @@
 package com.edvin.aichat.exception;
 
+import org.springframework.boot.web.error.Error;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,10 +10,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                ex.getMessage()
+        );
+
         return ResponseEntity
-                .internalServerError()
-                .body("Something went wring: " + e.getMessage());
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(error);
     }
 
 }
