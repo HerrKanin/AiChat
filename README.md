@@ -46,6 +46,16 @@ http://localhost:8080/swagger-ui.html
 
 ---
 
+## Personalities
+
+Available personalities:
+
+- helper
+- coder
+- pirate
+
+---
+
 ## 📝 Notes
 
 - API keys are not included for security reasons

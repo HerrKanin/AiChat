@@ -27,6 +27,11 @@
         const chat = document.getElementById("chat");
 
         const message = messageInput.value;
+
+        if (!message) {
+            alert("Skriv ett meddelande först");
+            return;
+        }
         const personality = document.getElementById("personality").value;
 
         chat.innerHTML += `<p><strong>Du:</strong> ${message}</p>`;
